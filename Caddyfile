@@ -1,0 +1,14 @@
+# Caddy obtains and renews the TLS certificate for RELAY_DOMAIN by itself.
+{$RELAY_DOMAIN} {
+    handle /v2/ws {
+        reverse_proxy 127.0.0.1:8080 {
+            # Replace, never append, so the relay sees exactly one client address.
+            header_up X-Forwarded-For {http.request.remote.host}
+        }
+    }
+
+    # Nothing else is served: never expose /v1/ws or the relay port.
+    handle {
+        respond 404
+    }
+}

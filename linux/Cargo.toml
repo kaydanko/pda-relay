@@ -1,0 +1,32 @@
+[package]
+name = "pda-relay"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Stateless Linux reference relay for PDA Network"
+
+[dependencies]
+axum.workspace = true
+pda-relay-protocol = { path = "../protocol" }
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[features]
+# Stage 6 only: one-shot fault hooks and aggregate counters under /v2/test/*, served only by a debug-loopback
+# relay. Never enable for a deployed relay.
+test-faults = ["pda-relay-protocol/test-faults"]
+
+[dev-dependencies]
+futures-util.workspace = true
+tempfile = "=3.21.0"
+tokio-tungstenite.workspace = true
+
+[lib]
+name = "pda_relay"
+path = "src/lib.rs"
+
+[[bin]]
+name = "pda-relay"
+path = "src/main.rs"

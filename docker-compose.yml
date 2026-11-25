@@ -1,0 +1,32 @@
+# PDA relay with automatic HTTPS. Set RELAY_DOMAIN in .env (see .env.example), then:
+#   docker compose up -d --build
+services:
+  proxy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      RELAY_DOMAIN: "${RELAY_DOMAIN:?set RELAY_DOMAIN in .env}"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+  relay:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - proxy
+    # The relay listens on 127.0.0.1:8080 inside the proxy's network; only Caddy's 80/443 are public.
+    network_mode: "service:proxy"
+    environment:
+      PDA_RELAY_LISTEN: "127.0.0.1:8080"
+      PDA_RELAY_V2_AUDIENCE: "wss://${RELAY_DOMAIN:?set RELAY_DOMAIN in .env}:443/v2/ws|pda-relay.cbor.v2"
+      PDA_RELAY_V2_TRUST_PROXY: "1"
+      RUST_LOG: "pda_relay=info"
+
+volumes:
+  caddy_data:
+  caddy_config:

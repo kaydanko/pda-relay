@@ -1,0 +1,21 @@
+[package]
+name = "pda-relay-protocol"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Portable, bounded CBOR wire codec for the PDA relay protocol"
+
+[dependencies]
+minicbor.workspace = true
+p256 = { version = "=0.14.0", default-features = false, features = ["ecdsa", "pkcs8", "alloc"] }
+sha2 = { version = "=0.11.0", default-features = false }
+
+[features]
+# Stage 6 fault hooks of the Linux relay only (read-only route authority); never for a deployed relay.
+test-faults = []
+
+[dev-dependencies]
+# v1 identity vector tests keep the exact dependency versions they were accepted with.
+p256_v013 = { package = "p256", version = "=0.13.2", features = ["ecdsa", "pkcs8"] }
+sha2_v010 = { package = "sha2", version = "=0.10.9" }
